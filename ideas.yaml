@@ -1,0 +1,313 @@
+JD Schema 1 example: {
+  "job_profile": {
+    "title": "string",
+    "level": "string",
+    "domain": ["string"],
+    "client": {
+      "name": "string",
+      "region": "string"
+    },
+    "employment": {
+      "type": "string",
+      "working_mode": "string",
+      "location": "string",
+      "work_hours": "string",
+      "remote_policy": "string"
+    },
+    "experience": {
+      "min_years": "number",
+      "seniority_notes": "string"
+    },
+    "responsibilities": ["string"],
+    "requirements": {
+      "must_have": [
+        { "category": "string", "items": ["string"] }
+      ],
+      "nice_to_have": [
+        { "category": "string", "items": ["string"] }
+      ],
+      "education": ["string"],
+      "languages": [
+        { "name": "string", "level": "string", "test": { "name": "string", "score": "string" } }
+      ]
+    },
+    "skills": {
+      "backend": ["string"],
+      "frontend": ["string"],
+      "mobile": ["string"],
+      "database": ["string"],
+      "cloud_devops": ["string"],
+      "data_ml": ["string"],
+      "qa": ["string"],
+      "security": ["string"],
+      "architecture": ["string"],
+      "methodologies": ["string"],
+      "tools": ["string"]
+    },
+    "compensation_benefits": {
+      "salary_range": "string",
+      "bonus": "string",
+      "allowances": ["string"],
+      "insurance": ["string"],
+      "pto": "string",
+      "other_benefits": ["string"]
+    },
+    "process": {
+      "interview_steps": ["string"],
+      "start_date": "string"
+    },
+    "raw_sections": [
+      { "section_title": "string", "content": "string" }
+    ]
+  }
+}
+
+
+CV Schema 2 example: {
+  "candidate_profile": {
+    "identity": {
+      "full_name": "string",
+      "location": "string",
+      "contact": {
+        "email": "string",
+        "phone": "string",
+        "links": ["string"]
+      }
+    },
+    "headline": {
+      "current_position": "string",
+      "seniority": "string",
+      "total_years_of_experience": "number"
+    },
+    "summary": "string",
+    "skills": {
+      "programming_languages": [
+        { "name": "string", "years_used": "number", "last_used_year": "number", "proficiency": "string" }
+      ],
+      "frameworks": [{ "name": "string" }],
+      "databases": [{ "name": "string" }],
+      "cloud_platforms": [{ "name": "string", "services": ["string"] }],
+      "tools_platforms": [{ "name": "string" }],
+      "methodologies": ["string"]
+    },
+    "experience": [
+      {
+        "company": "string",
+        "title": "string",
+        "start_date": "string",
+        "end_date": "string",
+        "location": "string",
+        "highlights": ["string"],
+        "projects": [
+          {
+            "project_name": "string",
+            "domain": ["string"],
+            "role": "string",
+            "team_size": "string",
+            "description": "string",
+            "responsibilities": ["string"],
+            "technologies": ["string"],
+            "impact": ["string"],
+            "maintenance_split": { "new_dev_percent": "number", "maintenance_percent": "number" }
+          }
+        ]
+      }
+    ],
+    "education": [
+      { "school": "string", "degree": "string", "major": "string", "start_year": "number", "end_year": "number" }
+    ],
+    "certifications": [
+      { "name": "string", "issuer": "string", "year": "number", "credential_url": "string" }
+    ],
+    "languages": [
+      { "name": "string", "level": "string", "test": { "name": "string", "score": "string" } }
+    ],
+    "domain_expertise": ["string"],
+    "awards_achievements": ["string"],
+    "activities": ["string"],
+    "raw_sections": [
+      { "section_title": "string", "content": "string" }
+    ]
+  }
+}
+
+
+"scoring_rubric": {
+  "version": "1.0",
+  "philosophy": "Hard eligibility filters first, then hybrid scoring (symbolic + semantic)",
+  "total_score": 100,
+
+  "stage_0_hard_filters": {
+    "experience": {
+      "enabled": true,
+      "min_years": "jd_defined",
+      "override_allowed": true,
+      "override_conditions": [
+        "strong_system_design_evidence",
+        "clear_ownership_of_large_components"
+      ]
+    },
+    "required_skills": {
+      "enabled": true,
+      "coverage_threshold": 0.7,
+      "equivalency_rules": true
+    },
+    "location_work_mode": {
+      "enabled": true,
+      "hard_reject_on_mismatch": true
+    },
+    "industry": {
+      "enabled": false,
+      "note": "Used as preference, not hard rejection"
+    }
+  },
+
+  "stage_1_symbolic_scoring": {
+    "weight": 55,
+    "components": {
+      "must_have_skill_coverage": {
+        "weight": 35,
+        "calculation": "matched_required_skills / total_required_skills",
+        "min_required": 0.7,
+        "scoring": {
+          ">=0.9": 35,
+          "0.8-0.89": 28,
+          "0.7-0.79": 20,
+          "<0.7": 0
+        }
+      },
+      "technical_depth": {
+        "weight": 20,
+        "signals": {
+          "years_per_skill": true,
+          "recent_usage": true,
+          "production_experience": true,
+          "system_scale": true
+        },
+        "scoring": {
+          "high": 20,
+          "medium": 12,
+          "low": 5,
+          "none": 0
+        }
+      }
+    }
+  },
+
+  "stage_2_semantic_scoring": {
+    "weight": 45,
+    "embeddings": {
+      "global": {
+        "weight": 0.2,
+        "text_sources": [
+          "job_titles",
+          "company_context",
+          "recent_experience_descriptions"
+        ],
+        "excludes": [
+          "self_written_summary"
+        ]
+      },
+      "skills_tech": {
+        "weight": 0.6,
+        "text_sources": [
+          "normalized_skill_blocks",
+          "project_technology_descriptions",
+          "architecture_keywords"
+        ]
+      },
+      "skills_language": {
+        "weight": 0.2,
+        "text_sources": [
+          "language_skills",
+          "certifications",
+          "communication_evidence"
+        ]
+      }
+    },
+    "semantic_score_formula": {
+      "description": "Role-conditioned weighted cosine similarity",
+      "default_formula": "0.2*global + 0.6*skills_tech + 0.2*skills_language"
+    }
+  },
+
+  "stage_3_domain_and_context_bonus": {
+    "weight": 10,
+    "components": {
+      "domain_match": {
+        "enabled": true,
+        "scoring": {
+          "exact_domain_match": 10,
+          "regulated_or_similar_domain": 6,
+          "general_software_domain": 3,
+          "irrelevant_domain": 0
+        }
+      },
+      "project_context": {
+        "enabled": true,
+        "signals": [
+          "greenfield_projects",
+          "large_scale_systems",
+          "mission_critical_systems"
+        ]
+      }
+    }
+  },
+
+  "stage_4_delta_factors": {
+    "weight": 5,
+    "components": {
+      "specialized_technologies": [
+        "AI",
+        "ML",
+        "IoT",
+        "FOTA",
+        "LowCode",
+        "Blockchain"
+      ],
+      "recognition": [
+        "awards",
+        "scholarships",
+        "high_tier_certifications"
+      ],
+      "cap_rule": "Delta factors cannot exceed 5% of total score"
+    }
+  },
+
+  "final_score_calculation": {
+    "formula": "symbolic_score + semantic_score + domain_bonus + delta_bonus",
+    "shortlist_threshold": 70,
+    "strong_hire_threshold": 85,
+    "reject_threshold": 55
+  },
+
+  "role_weight_overrides": {
+    "backend_engineer": {
+      "semantic_weights": {
+        "global": 0.15,
+        "skills_tech": 0.7,
+        "skills_language": 0.15
+      }
+    },
+    "frontend_engineer": {
+      "semantic_weights": {
+        "global": 0.2,
+        "skills_tech": 0.65,
+        "skills_language": 0.15
+      }
+    },
+    "business_analyst": {
+      "semantic_weights": {
+        "global": 0.4,
+        "skills_tech": 0.25,
+        "skills_language": 0.35
+      }
+    }
+  },
+
+  "output_metadata": {
+    "explainability": true,
+    "score_breakdown_required": true,
+    "false_negative_review_bucket": "55-69"
+  }
+}

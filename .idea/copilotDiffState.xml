@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/mock_api.py">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/mock_api.py" />
+              <option name="updatedContent" value="#!/usr/bin/env python3&#10;&quot;&quot;&quot;&#10;Simple mock API server to test CORS&#10;&quot;&quot;&quot;&#10;from fastapi import FastAPI&#10;from fastapi.middleware.cors import CORSMiddleware&#10;import uvicorn&#10;&#10;app = FastAPI(title=&quot;CV-JD Mock API&quot;)&#10;&#10;# Add CORS middleware&#10;app.add_middleware(&#10;    CORSMiddleware,&#10;    allow_origins=[&quot;*&quot;],  # Allow all origins for testing&#10;    allow_credentials=True,&#10;    allow_methods=[&quot;*&quot;],&#10;    allow_headers=[&quot;*&quot;],&#10;)&#10;&#10;@app.get(&quot;/health&quot;)&#10;def health_check():&#10;    return {&quot;status&quot;: &quot;healthy&quot;, &quot;message&quot;: &quot;Mock API is running&quot;}&#10;&#10;@app.get(&quot;/&quot;)&#10;def root():&#10;    return {&quot;message&quot;: &quot;CV-JD Mock API&quot;, &quot;status&quot;: &quot;running&quot;}&#10;&#10;@app.get(&quot;/api/v1/cv/&quot;)&#10;def list_cvs():&#10;    return []&#10;&#10;@app.get(&quot;/api/v1/jd/&quot;) &#10;def list_jds():&#10;    return []&#10;&#10;if __name__ == &quot;__main__&quot;:&#10;    print(&quot;Starting mock API server on http://localhost:8080&quot;)&#10;    print(&quot;CORS is enabled for all origins&quot;)&#10;    uvicorn.run(app, host=&quot;0.0.0.0&quot;, port=8080)" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/test_api.sh">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/test_api.sh" />
+              <option name="originalContent" value="&#10;" />
+              <option name="updatedContent" value="#!/bin/bash&#10;set -euo pipefail&#10;&#10;API_BASE=${1:-&quot;http://localhost:8080&quot;}&#10;&#10;echo &quot;Testing CV-JD Matcher API at: $API_BASE&quot;&#10;echo&#10;&#10;# Test health endpoint&#10;echo &quot;1. Testing health endpoint...&quot;&#10;if curl -s -f &quot;$API_BASE/health&quot; &gt; /dev/null; then&#10;    echo &quot;✓ Health endpoint is working&quot;&#10;    echo &quot;Response: $(curl -s &quot;$API_BASE/health&quot;)&quot;&#10;else&#10;    echo &quot;✗ Health endpoint failed&quot;&#10;    echo &quot;  - Is the backend running?&quot;&#10;    echo &quot;  - Check: docker compose ps&quot;&#10;    echo &quot;  - Check logs: docker compose logs api&quot;&#10;    exit 1&#10;fi&#10;&#10;echo&#10;&#10;# Test root endpoint&#10;echo &quot;2. Testing root endpoint...&quot;&#10;if curl -s -f &quot;$API_BASE/&quot; &gt; /dev/null; then&#10;    echo &quot;✓ Root endpoint is working&quot;&#10;    echo &quot;Response: $(curl -s &quot;$API_BASE/&quot;)&quot;&#10;else&#10;    echo &quot;✗ Root endpoint failed&quot;&#10;fi&#10;&#10;echo&#10;&#10;# Test CV list endpoint&#10;echo &quot;3. Testing CV list endpoint...&quot;&#10;if curl -s -f &quot;$API_BASE/api/v1/cv/&quot; &gt; /dev/null; then&#10;    echo &quot;✓ CV list endpoint is working&quot;&#10;    response=$(curl -s &quot;$API_BASE/api/v1/cv/&quot;)&#10;    echo &quot;Response: $response&quot;&#10;else&#10;    echo &quot;✗ CV list endpoint failed&quot;&#10;fi&#10;&#10;echo&#10;&#10;# Test JD list endpoint&#10;echo &quot;4. Testing JD list endpoint...&quot;&#10;if curl -s -f &quot;$API_BASE/api/v1/jd/&quot; &gt; /dev/null; then&#10;    echo &quot;✓ JD list endpoint is working&quot;&#10;    response=$(curl -s &quot;$API_BASE/api/v1/jd/&quot;)&#10;    echo &quot;Response: $response&quot;&#10;else&#10;    echo &quot;✗ JD list endpoint failed&quot;&#10;fi&#10;&#10;echo&#10;echo &quot;API test complete!&quot;&#10;echo&#10;echo &quot;If tests passed, open: http://localhost:4174&quot;&#10;echo &quot;The frontend should now connect to: $API_BASE&quot;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

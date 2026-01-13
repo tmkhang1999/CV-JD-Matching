@@ -1,0 +1,330 @@
+{
+  "cv_matching_site_plan_optimized": {
+    "version": "1.0",
+    "goals": [
+      "Effective matching with low false negatives",
+      "Recruiter-friendly UX (fast decisions, clear reasons/gaps)",
+      "Minimize configuration fatigue (presets first, advanced optional)",
+      "Retrieve-then-rerank for speed and cost control"
+    ],
+    "key_design_principles": {
+      "presets_over_knobs": "Role presets are the primary control; weights/thresholds moved to Advanced.",
+      "jd_driven_defaults": "Hard filters are auto-filled from selected JD(s) and can be overridden in Advanced.",
+      "single_primary_action": "One Match action; optional AI rerank applied only to top N results.",
+      "actionable_results": "Show top reasons, top gaps, and next actions; charts are optional and deprioritized."
+    },
+
+    "ui_structure": {
+      "section_a_selection": {
+        "a1_select_cv": {
+          "data_source": "/api/v1/cv/",
+          "display_fields": ["name", "current_position", "total_years_of_experience", "key_skills_preview"],
+          "features": {
+            "search": true,
+            "filters": ["role_category", "yoe_range", "primary_skills"],
+            "selection_indicator": true
+          }
+        },
+        "a2_select_jd_set": {
+          "data_source": "/api/v1/jd/",
+          "modes": ["single_jd", "jd_set"],
+          "display_fields": ["title", "domain", "client_region", "working_mode", "min_years_experience"],
+          "note": "Support matching one CV against many JDs; JD selection drives default filters."
+        }
+      },
+
+      "section_b_configuration": {
+        "primary_controls": {
+          "role_presets": {
+            "enabled": true,
+            "options": [
+              "backend_engineer",
+              "frontend_engineer",
+              "business_analyst",
+              "custom_advanced"
+            ],
+            "default": "backend_engineer",
+            "behavior": "Selecting a preset applies role-conditioned semantic weights and recommended thresholds."
+          },
+          "improve_ranking_with_ai_toggle": {
+            "enabled": true,
+            "default": false,
+            "description": "If enabled, rerank only the retrieved top N results using LLM analysis."
+          }
+        },
+        "advanced_controls": {
+          "enabled": true,
+          "default_collapsed": true,
+          "hard_filters": {
+            "min_years_experience": {
+              "source": "auto_from_jd",
+              "user_override": true,
+              "input_type": "number"
+            },
+            "required_skills": {
+              "source": "auto_from_jd",
+              "user_override": true,
+              "input_type": "tags_multi_select"
+            },
+            "required_skills_coverage_threshold": {
+              "default": 0.7,
+              "min": 0.0,
+              "max": 1.0,
+              "step": 0.05
+            },
+            "domain_filter": {
+              "source": "auto_from_jd",
+              "user_override": true,
+              "input_type": "multi_select"
+            },
+            "location_work_mode_filter": {
+              "source": "auto_from_jd",
+              "user_override": true,
+              "input_type": "multi_select",
+              "note": "Work-mode mismatch can be configured as hard reject."
+            }
+          },
+          "semantic_weights": {
+            "global_context": { "default": 0.2, "min": 0.0, "max": 1.0, "step": 0.05 },
+            "technical_skills": { "default": 0.6, "min": 0.0, "max": 1.0, "step": 0.05 },
+            "language_skills": { "default": 0.2, "min": 0.0, "max": 1.0, "step": 0.05 },
+            "validation": {
+              "sum_to_one": true,
+              "auto_normalize_if_needed": true
+            }
+          }
+        }
+      },
+
+      "section_c_matching_action": {
+        "primary_button": {
+          "label": "Match",
+          "behavior": [
+            "Run fast vector retrieval (semantic search) to get top_k results",
+            "If AI toggle enabled: run rerank on retrieved set only"
+          ]
+        },
+        "defaults": {
+          "top_k_retrieval": 30,
+          "page_size": 10
+        }
+      },
+
+      "section_d_results": {
+        "results_header": {
+          "elements": [
+            "total_results_count",
+            "active_filters_summary",
+            "threshold_legend"
+          ],
+          "sorting_options": [
+            "overall_score",
+            "must_have_coverage",
+            "tech_fit",
+            "recency"
+          ],
+          "filtering_options": [
+            "score_threshold",
+            "domain_match",
+            "company_or_client",
+            "missing_must_haves"
+          ],
+          "charts": {
+            "enabled": false,
+            "note": "Deprioritized for MVP; add later if users request."
+          }
+        },
+        "result_cards": {
+          "default_fields": [
+            "rank",
+            "job_title",
+            "company_or_client",
+            "overall_score",
+            "label",
+            "must_have_coverage_percent",
+            "top_3_match_reasons",
+            "top_3_gaps"
+          ],
+          "quick_actions": [
+            "view_jd_details",
+            "compare_side_by_side",
+            "shortlist_with_note",
+            "reject_with_note"
+          ],
+          "collapsible_details": {
+            "enabled": true,
+            "sections": [
+              "symbolic_breakdown",
+              "semantic_breakdown",
+              "domain_context_bonus",
+              "ai_explanation_if_reranked"
+            ]
+          },
+          "confidence_indicator": {
+            "enabled": true,
+            "basis": [
+              "explicit_evidence_vs_inferred",
+              "completeness_of_extraction",
+              "must_have_coverage_margin"
+            ],
+            "levels": ["high", "medium", "low"]
+          }
+        }
+      },
+
+      "section_e_comparison_view": {
+        "enabled": true,
+        "trigger": "on_demand_from_result_card",
+        "features": {
+          "skill_highlighting": {
+            "matched": "highlight_green",
+            "missing_must_have": "highlight_red",
+            "nice_to_have": "highlight_blue"
+          },
+          "experience_alignment": {
+            "enabled": true,
+            "visualization": "timeline_or_bullets"
+          },
+          "interview_questions_from_gaps": {
+            "enabled": true,
+            "requires_ai_rerank": true
+          }
+        }
+      }
+    },
+
+    "scoring_display_legend": {
+      "thresholds": [
+        { "range": ">=85", "label": "Strong Hire", "color": "green", "action": "Proceed to interview" },
+        { "range": "70-84", "label": "Shortlist", "color": "blue", "action": "Consider for next round" },
+        { "range": "55-69", "label": "Review Bucket", "color": "yellow", "action": "Manual review needed" },
+        { "range": "<55", "label": "Below Threshold", "color": "red", "action": "Not recommended" }
+      ],
+      "default_view": "overall_score_with_reasons_and_gaps",
+      "note": "Detailed breakdown is collapsible to keep cards readable."
+    },
+
+    "api_endpoints": {
+      "existing": [
+        { "action": "Get all CVs", "endpoint": "/api/v1/cv/", "method": "GET" },
+        { "action": "Get all JDs", "endpoint": "/api/v1/jd/", "method": "GET" },
+        { "action": "Vector Match (Retrieve)", "endpoint": "/api/v1/match/cv/{cv_id}/jds", "method": "POST" },
+        { "action": "AI Rerank (Rerank retrieved set)", "endpoint": "/api/v1/match/cv/{cv_id}/jds/rerank", "method": "POST" },
+        { "action": "View JD Details", "endpoint": "/api/v1/jd/{id}", "method": "GET" }
+      ],
+      "recommended_additions": [
+        {
+          "action": "Persist screening decisions",
+          "endpoint": "/api/v1/decisions",
+          "method": "POST",
+          "payload": {
+            "cv_id": "string",
+            "jd_id": "string",
+            "decision": "shortlist|reject|review",
+            "note": "string",
+            "score_snapshot": "object"
+          }
+        },
+        {
+          "action": "Fetch past decisions",
+          "endpoint": "/api/v1/decisions",
+          "method": "GET",
+          "query_params": ["cv_id", "jd_id"]
+        }
+      ],
+      "matching_request_contracts": {
+        "retrieve_request": {
+          "endpoint": "/api/v1/match/cv/{cv_id}/jds",
+          "method": "POST",
+          "body": {
+            "jd_scope": "single_jd|jd_set",
+            "jd_ids": ["string"],
+            "preset": "backend_engineer|frontend_engineer|business_analyst|custom",
+            "top_k": 30,
+            "filters": {
+              "min_years_experience": "number",
+              "required_skills": ["string"],
+              "required_skills_coverage_threshold": 0.7,
+              "domains": ["string"],
+              "location_work_mode": ["string"]
+            },
+            "semantic_weights": {
+              "global": 0.2,
+              "tech": 0.6,
+              "language": 0.2
+            },
+            "return_explanations": false
+          }
+        },
+        "rerank_request": {
+          "endpoint": "/api/v1/match/cv/{cv_id}/jds/rerank",
+          "method": "POST",
+          "body": {
+            "candidate_jd_ids": ["string"],
+            "explanations": true
+          }
+        }
+      }
+    },
+
+    "product_questions_answers": {
+        "role_presets_feature": {
+          "answer": "yes",
+          "implementation": {
+            "enabled": true,
+            "default_primary_control": true,
+            "presets": [ "backend_engineer", "frontend_engineer", "business_analyst", "custom_advanced" ]
+          },
+          "rationale": "Reduces configuration fatigue and improves consistency for most users."
+        },
+        "comparison_view": {
+          "answer": "yes_on_demand",
+          "implementation": {
+            "enabled": true,
+            "trigger": "from_result_card_compare_button",
+            "standalone_section": false
+          },
+          "rationale": "Useful for deep review, but should not clutter the main flow."
+        },
+        "score_breakdown_charts": {
+          "answer": "numerical_values_first_defer_charts",
+          "implementation": {
+            "default": "numerical_values_with_reasons_and_gaps",
+            "charts_enabled_in_mvp": false,
+            "future_option": true
+          },
+          "rationale": "Charts add complexity without improving day-to-day screening decisions as much as reasons/gaps."
+        },
+        "results_per_page": {
+          "answer": "configurable_default_10",
+          "implementation": {
+            "default_page_size": 10,
+            "options": [ 10, 20, 50 ]
+          },
+          "rationale": "10 is efficient for screening; 5 is too slow; larger options help power users."
+        },
+        "features_to_remove_or_add": {
+          "remove_from_default_ui": [
+            "semantic_weight_sliders",
+            "required_skills_coverage_threshold_controls"
+          ],
+          "move_to_advanced": [
+            "semantic_weight_sliders",
+            "hard_filter_overrides",
+            "coverage_threshold_slider"
+          ],
+          "add_features": [
+            "retrieve_then_rerank_single_match_flow",
+            "top_3_match_reasons_and_top_3_gaps_on_cards",
+            "persist_shortlist_reject_decisions_with_notes",
+            "confidence_indicator_based_on_evidence_quality",
+            "search_within_results"
+          ],
+          "defer_features": [
+            "score_distribution_charts",
+            "full_delta_factor_breakdown_on_every_card"
+          ]
+        }
+    }
+
+}

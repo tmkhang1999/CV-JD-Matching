@@ -1,0 +1,168 @@
+{
+  "ui_style_rules": {
+    "color_scheme": {
+      "theme": "dark_vibrant",
+      "background": {
+        "primary": "#0a0a0a",
+        "secondary": "#1a1a1a",
+        "tertiary": "#2a2a2a",
+        "card": "#1e1e1e"
+      },
+      "text": {
+        "primary": "#ffffff",
+        "secondary": "#e0e0e0",
+        "muted": "#a0a0a0",
+        "hint": "#707070"
+      },
+      "accent": {
+        "primary": "#3b82f6",
+        "primary_hover": "#2563eb",
+        "secondary": "#8b5cf6",
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "error": "#ef4444",
+        "info": "#06b6d4"
+      },
+      "interactive": {
+        "button_primary": "#3b82f6",
+        "button_primary_hover": "#2563eb",
+        "button_secondary": "#6366f1",
+        "input_border": "#374151",
+        "input_focus": "#3b82f6",
+        "input_background": "#1f2937"
+      },
+      "borders": {
+        "default": "#2d2d2d",
+        "hover": "#3d3d3d",
+        "focus": "#3b82f6"
+      }
+    },
+    "typography": {
+      "font_family": "system-ui, -apple-system, sans-serif",
+      "headers": {
+        "h1": {
+          "size": "2.5rem",
+          "weight": "700",
+          "color": "#ffffff",
+          "letter_spacing": "-0.02em"
+        },
+        "h2": {
+          "size": "2rem",
+          "weight": "700",
+          "color": "#ffffff"
+        },
+        "h3": {
+          "size": "1.5rem",
+          "weight": "600",
+          "color": "#e0e0e0"
+        }
+      },
+      "body": {
+        "size": "1rem",
+        "weight": "400",
+        "line_height": "1.6",
+        "color": "#e0e0e0"
+      },
+      "labels": {
+        "size": "0.875rem",
+        "weight": "500",
+        "color": "#a0a0a0",
+        "text_transform": "uppercase",
+        "letter_spacing": "0.05em"
+      }
+    },
+    "components": {
+      "buttons": {
+        "primary": {
+          "background": "#3b82f6",
+          "hover_background": "#2563eb",
+          "text_color": "#ffffff",
+          "border_radius": "0.5rem",
+          "padding": "0.75rem 1.5rem",
+          "font_weight": "600",
+          "transition": "all 0.2s ease",
+          "box_shadow": "0 4px 6px rgba(59, 130, 246, 0.3)"
+        },
+        "secondary": {
+          "background": "transparent",
+          "border": "1px solid #374151",
+          "hover_background": "#1f2937",
+          "text_color": "#e0e0e0",
+          "border_radius": "0.5rem",
+          "padding": "0.75rem 1.5rem"
+        }
+      },
+      "inputs": {
+        "background": "#1f2937",
+        "border": "1px solid #374151",
+        "border_radius": "0.5rem",
+        "padding": "0.75rem 1rem",
+        "text_color": "#ffffff",
+        "placeholder_color": "#6b7280",
+        "focus_border": "#3b82f6",
+        "focus_ring": "0 0 0 3px rgba(59, 130, 246, 0.1)"
+      },
+      "cards": {
+        "background": "#1e1e1e",
+        "border": "1px solid #2d2d2d",
+        "border_radius": "0.75rem",
+        "padding": "1.5rem",
+        "hover_border": "#3b82f6",
+        "hover_shadow": "0 8px 16px rgba(59, 130, 246, 0.15)",
+        "transition": "all 0.3s ease"
+      },
+      "tabs": {
+        "inactive_color": "#6b7280",
+        "active_color": "#ffffff",
+        "active_border": "#3b82f6",
+        "border_width": "2px",
+        "hover_color": "#9ca3af"
+      },
+      "upload_zones": {
+        "background": "#1f2937",
+        "border": "2px dashed #374151",
+        "border_radius": "0.75rem",
+        "hover_border": "#3b82f6",
+        "hover_background": "#2a2a3a",
+        "text_color": "#e0e0e0"
+      }
+    },
+    "effects": {
+      "shadows": {
+        "small": "0 1px 3px rgba(0, 0, 0, 0.3)",
+        "medium": "0 4px 6px rgba(0, 0, 0, 0.4)",
+        "large": "0 10px 25px rgba(0, 0, 0, 0.5)",
+        "glow": "0 0 20px rgba(59, 130, 246, 0.3)"
+      },
+      "gradients": {
+        "primary": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+        "accent": "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)",
+        "subtle": "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)"
+      },
+      "transitions": {
+        "fast": "all 0.15s ease",
+        "medium": "all 0.3s ease",
+        "slow": "all 0.5s ease"
+      }
+    },
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "2xl": "3rem"
+    },
+    "design_principles": [
+      "Use vibrant blue (#3b82f6) as primary accent color throughout",
+      "Add subtle gradients to headers and key sections",
+      "Include hover effects with color transitions on all interactive elements",
+      "Use shadows and glows to create depth",
+      "Add colored borders or underlines to active states",
+      "Implement smooth transitions (0.2-0.3s) for all state changes",
+      "Use color coding for different types of content (success=green, warning=orange, error=red)",
+      "Add subtle background gradients to cards and sections",
+      "Include colored icons or indicators for different statuses"
+    ]
+  }
+}
