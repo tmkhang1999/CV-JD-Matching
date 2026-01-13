@@ -2525,7 +2525,13 @@
   <script>
     // State management
     const state = {
-      apiBase: 'http://localhost:8080',
+      apiBase: (() => {
+        // Auto-detect API base URL based on current host
+        const host = window.location.hostname;
+        const protocol = window.location.protocol;
+        // Use the same host but port 8080 for API (docker-compose setup)
+        return `${protocol}//${host}:8080`;
+      })(),
       activeTab: 'upload',
       error: '',
       connectionStatus: 'testing', // testing, connected, disconnected
@@ -5655,9 +5661,24 @@
       if (content) app.appendChild(content);
     }
 
-    // Load saved API base from localStorage
+    // Load saved API base from localStorage (only if manually set)
     const saved = localStorage.getItem('API_BASE');
-    if (saved) state.apiBase = saved;
+    if (saved) {
+      // Only use saved API base if it's different from auto-detected
+      const autoDetected = (() => {
+        const host = window.location.hostname;
+        const protocol = window.location.protocol;
+        return `${protocol}//${host}:8080`;
+      })();
+
+      // If saved URL is different from auto-detected, user manually set it
+      if (saved !== autoDetected) {
+        state.apiBase = saved;
+      }
+    }
+
+    // Log the API base URL being used
+    console.log('API Base URL:', state.apiBase);
 
     // Initial render and auto-test connection
     render();
