@@ -183,3 +183,7 @@ cython_debug/
 draft
 examples
 .idea/
+backend/data
+.DS_Store
+.env.example
+/.idea
