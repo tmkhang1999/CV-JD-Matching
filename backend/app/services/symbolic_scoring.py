@@ -273,37 +273,16 @@ def score_language_match(jd_languages: List[Dict], cv_languages: List[Dict]) -> 
 
 
 def normalize_skill_name(skill: str) -> str:
-    """Normalize skill name for comparison."""
+    """
+    Normalize skill name for comparison.
+    
+    NOTE: Most normalization is now handled by GPT during extraction (see extraction_gpt.py).
+    This function now only does basic cleanup for legacy or edge cases.
+    """
     if not skill:
         return ""
-    # Remove common suffixes/prefixes, lowercase, strip
-    skill = skill.lower().strip()
-    # Handle common variations
-    replacements = {
-        "javascript": "js",
-        "typescript": "ts",
-        "react.js": "react",
-        "reactjs": "react",
-        "node.js": "node",
-        "nodejs": "node",
-        "vue.js": "vue",
-        "vuejs": "vue",
-        "angular.js": "angular",
-        "angularjs": "angular",
-        "c#": "csharp",
-        "c++": "cpp",
-        ".net": "dotnet",
-        "postgresql": "postgres",
-        "mongodb": "mongo",
-        "kubernetes": "k8s",
-        "amazon web services": "aws",
-        "google cloud platform": "gcp",
-        "microsoft azure": "azure",
-    }
-    for old, new in replacements.items():
-        if old in skill:
-            skill = skill.replace(old, new)
-    return skill
+    # Basic cleanup: lowercase and strip whitespace
+    return skill.lower().strip()
 
 
 def extract_cv_skills(cv_data: Dict[str, Any]) -> set:

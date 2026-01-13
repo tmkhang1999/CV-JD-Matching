@@ -325,6 +325,17 @@ IMPORTANT RULES:
 7. Normalize language proficiency to: native, fluent, advanced, intermediate, or basic
 8. Be comprehensive - extract all mentioned skills, responsibilities, and experience
 
+CRITICAL - SKILL NORMALIZATION:
+When extracting skills and technologies, normalize them to their canonical form for better matching:
+- Use standard naming: "React" not "React.js" or "ReactJS", "Node" not "Node.js" or "NodeJS"
+- Abbreviate common terms: "JavaScript" → "JS", "TypeScript" → "TS", "Kubernetes" → "K8s"
+- Standardize cloud providers: "Amazon Web Services" → "AWS", "Google Cloud Platform" → "GCP"
+- Normalize databases: "PostgreSQL" → "Postgres", "MongoDB" → "Mongo"
+- Unify variants: ".NET" / "DotNet" → "dotnet", "C#" → "csharp", "C++" → "cpp"
+- Keep frameworks consistent: "Vue.js" → "Vue", "Angular.js" → "Angular"
+- Use the most common industry name for each technology
+- Apply the same normalization rules consistently across both CV and JD to ensure matching works
+
 Schema to follow:
 {schema_str}"""
 
