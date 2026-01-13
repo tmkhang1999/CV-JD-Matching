@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RawSection(BaseModel):
@@ -33,57 +33,57 @@ class LanguageRequirement(BaseModel):
 
 class RequirementItem(BaseModel):
     category: Optional[str] = None
-    items: List[str] = []
+    items: List[str] = Field(default_factory=list)
 
 
 class Requirements(BaseModel):
-    must_have: List[RequirementItem] = []
-    nice_to_have: List[RequirementItem] = []
-    education: List[str] = []
-    languages: List[LanguageRequirement] = []
+    must_have: List[RequirementItem] = Field(default_factory=list)
+    nice_to_have: List[RequirementItem] = Field(default_factory=list)
+    education: List[str] = Field(default_factory=list)
+    languages: List[LanguageRequirement] = Field(default_factory=list)
 
 
 class Skills(BaseModel):
-    backend: List[str] = []
-    frontend: List[str] = []
-    mobile: List[str] = []
-    database: List[str] = []
-    cloud_devops: List[str] = []
-    data_ml: List[str] = []
-    qa: List[str] = []
-    security: List[str] = []
-    architecture: List[str] = []
-    methodologies: List[str] = []
-    tools: List[str] = []
+    backend: List[str] = Field(default_factory=list)
+    frontend: List[str] = Field(default_factory=list)
+    mobile: List[str] = Field(default_factory=list)
+    database: List[str] = Field(default_factory=list)
+    cloud_devops: List[str] = Field(default_factory=list)
+    data_ml: List[str] = Field(default_factory=list)
+    qa: List[str] = Field(default_factory=list)
+    security: List[str] = Field(default_factory=list)
+    architecture: List[str] = Field(default_factory=list)
+    methodologies: List[str] = Field(default_factory=list)
+    tools: List[str] = Field(default_factory=list)
 
 
 class CompensationBenefits(BaseModel):
     salary_range: Optional[str] = None
     bonus: Optional[str] = None
-    allowances: List[str] = []
-    insurance: List[str] = []
+    allowances: List[str] = Field(default_factory=list)
+    insurance: List[str] = Field(default_factory=list)
     pto: Optional[str] = None
-    other_benefits: List[str] = []
+    other_benefits: List[str] = Field(default_factory=list)
 
 
 class Process(BaseModel):
-    interview_steps: List[str] = []
+    interview_steps: List[str] = Field(default_factory=list)
     start_date: Optional[str] = None
 
 
 class JobProfile(BaseModel):
     title: Optional[str] = None
     level: Optional[str] = None
-    domain: List[str] = []
+    domain: List[str] = Field(default_factory=list)
     client: Optional[Client] = None
     employment: Optional[Employment] = None
     experience: Optional[Experience] = None
-    responsibilities: List[str] = []
+    responsibilities: List[str] = Field(default_factory=list)
     requirements: Requirements
     skills: Skills
     compensation_benefits: Optional[CompensationBenefits] = None
     process: Optional[Process] = None
-    raw_sections: List[RawSection] = []
+    raw_sections: List[RawSection] = Field(default_factory=list)
 
 
 class JDStructured(BaseModel):
