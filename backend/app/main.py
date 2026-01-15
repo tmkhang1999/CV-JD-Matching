@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1 import routes_cv, routes_jd, routes_match
+from app.api.v1 import routes_cv, routes_jd, routes_match, routes_models
 
 app = FastAPI(
     title=settings.app.title,
@@ -16,6 +16,7 @@ def health_check():
 app.include_router(routes_cv.router, prefix="/api/v1/cv", tags=["cv"])
 app.include_router(routes_jd.router, prefix="/api/v1/jd", tags=["jd"])
 app.include_router(routes_match.router, prefix="/api/v1/match", tags=["match"])
+app.include_router(routes_models.router, prefix="/api/v1/models", tags=["models"])
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,

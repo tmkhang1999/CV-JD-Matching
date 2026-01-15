@@ -82,7 +82,14 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.5rem;
+      gap: 0.75rem;
+    }
+
+    .header-actions-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
     }
 
     .connection-status {
@@ -293,6 +300,107 @@
     .upload-area.disabled {
       pointer-events: none;
       opacity: 0.5;
+    }
+
+    .model-selector-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 320px;
+      max-width: 320px;
+      width: 320px;
+    }
+
+    .model-selector-container.header-compact {
+      background: rgba(30, 30, 30, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .model-selector-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .model-refresh-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .model-refresh-btn:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent-hover);
+    }
+
+    .model-refresh-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .model-selector {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 0.375rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .model-selector:hover {
+      border-color: var(--accent);
+    }
+
+    .model-selector:focus {
+      outline: none;
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .model-option-text {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .model-price {
+      color: var(--success);
+      font-weight: 600;
+      font-size: 0.75rem;
+      margin-left: auto;
+      padding-left: 0.5rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .model-info {
+      font-size: 0.7rem;
+      color: var(--text-hint);
+      line-height: 1.3;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .model-info span {
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .section {
@@ -2513,7 +2621,10 @@
       <div class="header-slogan">Intelligent resume and job description matching powered by AI</div>
     </div>
     <div class="header-actions">
-      <div id="connectionStatus" class="connection-status testing">Testing connection...</div>
+      <div class="header-actions-row">
+        <div id="connectionStatus" class="connection-status testing">Testing connection...</div>
+        <div id="modelSelectorContainer"></div>
+      </div>
       <button id="testConnectionBtn" class="btn btn-secondary btn-small" onclick="testConnection()">
         Reconnect
       </button>
@@ -2539,6 +2650,8 @@
       toast: null,
       uploadedCVs: [], // Initialize as empty array
       uploadedJDs: [],  // Initialize as empty array
+      extractionModel: 'gpt-4o-mini', // Default extraction model
+      loadingModels: false, // Loading state for model list
 
       // Unified Matching state
       matching: {
@@ -2589,6 +2702,69 @@
         rerankedResults: null
       }
     };
+
+    // GPT Models with pricing (per 1M tokens) - will be loaded from API
+    let GPT_MODELS = [
+      {
+        id: 'gpt-4o-mini',
+        name: 'GPT-4o Mini',
+        inputPrice: 0.15,
+        outputPrice: 0.60,
+        description: 'Fast and affordable - Best for most use cases'
+      },
+      {
+        id: 'gpt-4o',
+        name: 'GPT-4o',
+        inputPrice: 2.50,
+        outputPrice: 10.00,
+        description: 'Advanced model - Better accuracy for complex documents'
+      },
+      {
+        id: 'gpt-4-turbo',
+        name: 'GPT-4 Turbo',
+        inputPrice: 10.00,
+        outputPrice: 30.00,
+        description: 'Most capable - Highest quality extraction'
+      }
+    ];
+
+    // Load available models from API
+    async function loadAvailableModels() {
+      try {
+        state.loadingModels = true;
+        render();
+        
+        console.log('🔍 Loading available GPT models from API...');
+        const models = await fetchJSON(apiUrl('/api/v1/models/available'));
+        
+        if (models && models.length > 0) {
+          GPT_MODELS = models;
+          console.log('✅ Loaded', models.length, 'GPT models:', models.map(m => m.id).join(', '));
+          
+          // If current selected model is not in the list, default to first model
+          if (!GPT_MODELS.find(m => m.id === state.extractionModel)) {
+            state.extractionModel = GPT_MODELS[0].id;
+            console.log('⚠️ Current model not available, switched to:', state.extractionModel);
+          }
+          
+          setToast(`Loaded ${models.length} GPT models`, 'success');
+        } else {
+          console.log('⚠️ No models returned from API, using default models');
+          setToast('Using default model list', 'info');
+        }
+      } catch (error) {
+        console.error('❌ Failed to load models from API:', error);
+        console.log('Using fallback model list');
+        setToast('Failed to load models, using defaults', 'error');
+      } finally {
+        state.loadingModels = false;
+        render(); // Re-render to update the model selector
+      }
+    }
+
+    function getModelInfo(modelId) {
+      return GPT_MODELS.find(m => m.id === modelId) || GPT_MODELS[0];
+    }
 
     const setToast = (message, kind = 'success') => {
       state.toast = { message, kind };
@@ -2803,6 +2979,7 @@
       try {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('extraction_model', state.extractionModel);
 
         const endpoint = type === 'cv' ? '/api/v1/cv/upload' : '/api/v1/jd/upload';
         const response = await fetch(apiUrl(endpoint), {
@@ -3745,6 +3922,60 @@
       } catch (e) {
         setToast(`Failed to download JD: ${e.message}`, 'error');
       }
+    }
+
+    // Render model selector component
+    function renderModelSelector(isHeader = false) {
+      const currentModel = getModelInfo(state.extractionModel);
+      
+      // Create select element
+      const selectEl = createElement('select', {
+        class: 'model-selector',
+        disabled: state.loadingModels,
+        onchange: (e) => {
+          state.extractionModel = e.target.value;
+          render();
+        }
+      }, GPT_MODELS.map(model => {
+        return createElement('option', {
+          value: model.id,
+          text: model.name,
+          selected: model.id === state.extractionModel
+        });
+      }));
+      
+      return createElement('div', { 
+        class: `model-selector-container ${isHeader ? 'header-compact' : ''}` 
+      }, [
+        createElement('label', { class: 'model-selector-label' }, [
+          createElement('span', { text: 'Extraction Model' }),
+          createElement('button', {
+            class: 'model-refresh-btn',
+            text: state.loadingModels ? '⟳ Loading...' : '⟳ Refresh',
+            disabled: state.loadingModels,
+            onclick: (e) => {
+              e.preventDefault();
+              loadAvailableModels();
+            },
+            title: 'Refresh model list from OpenAI API'
+          })
+        ]),
+        selectEl,
+        createElement('div', { 
+          class: 'model-info',
+          style: 'display: flex; justify-content: space-between; align-items: center;'
+        }, [
+          createElement('span', { 
+            text: state.loadingModels ? 'Loading models...' : currentModel.description,
+            style: 'flex: 1;'
+          }),
+          !state.loadingModels ? createElement('span', { 
+            class: 'model-price',
+            text: `$${currentModel.inputPrice}/$${currentModel.outputPrice} per 1M`,
+            style: 'flex-shrink: 0;'
+          }) : null
+        ].filter(Boolean))
+      ]);
     }
 
     // Render functions for different tabs
@@ -5619,6 +5850,13 @@
       const app = document.getElementById('app');
       app.innerHTML = '';
 
+      // Update header model selector
+      const modelSelectorContainer = document.getElementById('modelSelectorContainer');
+      if (modelSelectorContainer) {
+        modelSelectorContainer.innerHTML = '';
+        modelSelectorContainer.appendChild(renderModelSelector(true));
+      }
+
       // Tab navigation
       const tabs = createElement('div', { class: 'tabs' }, [
         createElement('button', {
@@ -5683,8 +5921,11 @@
     // Initial render and auto-test connection
     render();
 
-    // Auto-test connection on startup
-    setTimeout(testConnection, 500);
+    // Auto-test connection on startup and load models
+    setTimeout(() => {
+      testConnection();
+      loadAvailableModels();
+    }, 500);
   </script>
 </body>
 </html>

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, Depends, HTTPException, Form
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 from app.db.session import SessionLocal
@@ -90,15 +90,19 @@ def download_jd_file(jd_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/upload", response_model=JDCreateResponse)
-async def upload_jd(file: UploadFile, db: Session = Depends(get_db)):
+async def upload_jd(
+    file: UploadFile,
+    extraction_model: Optional[str] = Form(None),
+    db: Session = Depends(get_db)
+):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
 
     path = ingestion.save_upload_file(file)
     raw_text = ingestion.extract_raw_text(path)
 
-    # 1. GPT-4.1-mini extraction
-    structured_raw = extraction_gpt.extract_jd_structured(raw_text)
+    # 1. GPT extraction with optional model override
+    structured_raw = extraction_gpt.extract_jd_structured(raw_text, extraction_model)
 
     # 2. Normalize
     jd_struct = normalization.normalize_jd(structured_raw, raw_text)

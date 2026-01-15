@@ -298,14 +298,15 @@ def build_jd_schema() -> Dict[str, Any]:
     }
 
 
-def extract_with_gpt(raw_text: str, schema: Dict[str, Any], doc_type: str) -> Dict[str, Any]:
+def extract_with_gpt(raw_text: str, schema: Dict[str, Any], doc_type: str, model: str = None) -> Dict[str, Any]:
     """
-    Extract structured data from raw text using GPT-4.1-mini.
+    Extract structured data from raw text using GPT model.
 
     Args:
         raw_text: The raw document text
         schema: The JSON schema to follow
         doc_type: Either "CV" or "JD"
+        model: Optional model name override (defaults to settings.OPENAI_EXTRACTION_MODEL)
 
     Returns:
         Structured data as dictionary
@@ -346,8 +347,9 @@ Schema to follow:
 Return the extracted data in JSON format following the provided schema."""
 
     try:
+        extraction_model = model or settings.OPENAI_EXTRACTION_MODEL
         response = client.chat.completions.create(
-            model=settings.OPENAI_EXTRACTION_MODEL,
+            model=extraction_model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -360,16 +362,16 @@ Return the extracted data in JSON format following the provided schema."""
         return _safe_parse_json(content, doc_type)
 
     except Exception as e:
-        raise Exception(f"Failed to extract {doc_type} with GPT-4.1-mini: {str(e)}")
+        raise Exception(f"Failed to extract {doc_type} with {extraction_model}: {str(e)}")
 
 
-def extract_cv_structured(raw_text: str) -> Dict[str, Any]:
-    """Extract structured data from CV text using GPT-4.1-mini."""
+def extract_cv_structured(raw_text: str, model: str = None) -> Dict[str, Any]:
+    """Extract structured data from CV text using GPT model."""
     schema = build_cv_schema()
-    return extract_with_gpt(raw_text, schema, "CV")
+    return extract_with_gpt(raw_text, schema, "CV", model)
 
 
-def extract_jd_structured(raw_text: str) -> Dict[str, Any]:
-    """Extract structured data from JD text using GPT-4.1-mini."""
+def extract_jd_structured(raw_text: str, model: str = None) -> Dict[str, Any]:
+    """Extract structured data from JD text using GPT model."""
     schema = build_jd_schema()
-    return extract_with_gpt(raw_text, schema, "JD")
+    return extract_with_gpt(raw_text, schema, "JD", model)
